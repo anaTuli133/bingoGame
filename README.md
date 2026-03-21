@@ -1,6 +1,6 @@
 # 🦖 Dino Adventure - Side Scroller Game
 
-A classic, endless runner game built using the **p5.js** library. This game features a dynamic day/night cycle, colorful enemies, and challenging obstacles.
+A classic, endless runner game built using the **p5.js** library. This game features a dynamic day/night cycle, colorful enemies and challenging obstacles.
 
 ---
 
