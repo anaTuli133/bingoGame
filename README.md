@@ -10,10 +10,10 @@ Welcome to **Dino Adventure**! This is a high-paced, endless runner built with t
 
 I designed the UI to be clean and high-contrast, ensuring legibility across both Day and Night modes.
 
-| ☀️ Day Mode | 🌙 Night Mode | 🏆 Achievement |
-| :---: | :---: | :---: |
-| ![Day](image/day.png) | ![Night](image/night.png) | ![High Score](image/day_high_score.png) |
-| *Level 1: Pastel Blue Sky* | *Level 2: Deep Midnight* | *Dynamic Gold Overlay* |
+| ☀️ Day Mode | 🌙 Night Mode | 
+| :---: | :---: | 
+| ![Day](image/day.png) | ![Night](image/night.png) |
+| *Level 1: Pastel Blue Sky* | *Level 2: Deep Midnight* | 
 
 ### 💀 Game Over States
 | Ground Collision | High Score Achievement |
