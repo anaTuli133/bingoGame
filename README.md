@@ -2,7 +2,7 @@
 [![p5.js](https://img.shields.io/badge/p5.js-ED225D?style=for-the-badge&logo=p5dotjs&logoColor=white)](https://p5js.org/)
 
 
-Welcome to **Dino Adventure**! This is a high-paced, endless runner built with the **p5.js** library. As a developer and UI designer, I focused on creating a seamless user experience through smooth sprite animations, parallax scrolling, and an adaptive visual state machine.
+Welcome to **Dino Adventure**! This is a high-paced, endless runner built with the **p5.js** library. I focused on creating a seamless user experience through smooth sprite animations, parallax scrolling, and an adaptive visual state machine.
 
 ---
 
