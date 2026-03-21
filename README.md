@@ -10,7 +10,7 @@ A classic, endless runner game built using the **p5.js** library. This game feat
 | :---: | :---: |
 | ![Day Mode](/image/day.png) | ![Night Mode](image/night.png) |
 | **Action: High Jump** | **Status: Game Over** |
-| ![Jump Action](image/jump.png) | ![Game Over](image/game over.png) |
+| ![Jump Action](image/jump.png) | ![Game Over](image/game_over.png) |
 
 ---
 
