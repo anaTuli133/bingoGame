@@ -7,10 +7,23 @@ let scenery = [];
 let score = 0;
 let highScore = 0;
 let gameOver = false;
+let newHighScoreAchieved = false;
 let level = 1; 
 const groundHeight = 40;
 let obstacleSpacing = 110;
 let lastClickTime = 0;
+let gameSpeed = 7; 
+
+
+let jumpSound, hitSound, highscoreSound, birdSound;
+
+function preload() {
+  soundFormats('wav', 'mp3');
+  jumpSound = loadSound('image/jump.wav');
+  hitSound = loadSound('image/hit.wav');
+  highscoreSound = loadSound('image/highscore.wav');
+  birdSound = loadSound('image/bird.wav');  
+}
 
 function setup() {
   createCanvas(800, 400);
@@ -42,6 +55,15 @@ function draw() {
 
   if (!gameOver) {
     score++;
+    gameSpeed = 7 + floor(score / 10000); 
+
+    if (score > highScore) {
+      if (!newHighScoreAchieved && highScore > 0) {
+        highscoreSound.play();
+      }
+      highScore = score;
+      newHighScoreAchieved = true; 
+    }
     handleGameElements();
   }
 
@@ -97,10 +119,13 @@ function drawGround() {
 }
 
 function handleGameElements() {
-  if (frameCount % obstacleSpacing === 0) {
+  let currentSpacing = max(60, obstacleSpacing - floor(score / 5000) * 5);
+  
+  if (frameCount % currentSpacing === 0) {
     if (level === 1) {
       if (random(1) < 0.6) obstacles.push(new Obstacle());
-      else birds.push(new Bird());
+      else birds.push(new Bird()); 
+
     } else {
       obstacles.push(new Obstacle());
     }
@@ -111,14 +136,23 @@ function handleGameElements() {
     clouds[i].update(); clouds[i].show();
     if (clouds[i].offscreen()) clouds.splice(i, 1);
   }
+
+
   for (let i = obstacles.length - 1; i >= 0; i--) {
     obstacles[i].update(); obstacles[i].show();
-    if (dino.hits(obstacles[i])) gameOver = true;
+    if (dino.hits(obstacles[i])) {
+      gameOver = true;
+      hitSound.play(); 
+    }
     if (obstacles[i].offscreen()) obstacles.splice(i, 1);
   }
+
   for (let i = birds.length - 1; i >= 0; i--) {
     birds[i].update(); birds[i].show();
-    if (dino.hits(birds[i])) gameOver = true;
+    if (dino.hits(birds[i])) {
+      gameOver = true;
+      birdSound.play(); 
+    }
     if (birds[i].offscreen()) birds.splice(i, 1);
   }
 }
@@ -130,8 +164,18 @@ class Dino {
     this.gravity = 1.2; this.lift = -18; this.velocity = 0;
     this.legAngle = 0;
   }
-  jump() { if (this.y === height - groundHeight - this.h) this.velocity = this.lift; }
-  highJump() { if (this.y === height - groundHeight - this.h) this.velocity = this.lift - 7; }
+  jump() { 
+    if (this.y === height - groundHeight - this.h) {
+      this.velocity = this.lift;
+      jumpSound.play(); 
+    }
+  }
+  highJump() { 
+    if (this.y === height - groundHeight - this.h) {
+      this.velocity = this.lift - 7;
+      jumpSound.play(); 
+    }
+  }
   update() {
     this.velocity += this.gravity;
     this.y += this.velocity;
@@ -170,7 +214,7 @@ class Bird {
     this.birdColor = color(random(100, 255), random(100, 255), random(100, 255));
     this.wingAngle = 0;
   }
-  update() { this.x -= 8; this.wingAngle += 0.4; }
+  update() { this.x -= (gameSpeed + 1); this.wingAngle += 0.4; } 
   show() {
     push();
     translate(this.x, this.y);
@@ -197,7 +241,7 @@ class BackgroundElement {
     this.h = random(40, 80); this.w = random(30, 60); this.speed = 2;
   }
   update() {
-    this.x -= this.speed;
+    this.x -= (gameSpeed * 0.3); 
     if (this.x < -100) this.x = width + 50;
   }
   show() {
@@ -218,10 +262,9 @@ class Obstacle {
   constructor() {
     this.w = 25; this.h = random(45, 75);
     this.x = width; this.y = height - groundHeight - this.h;
-  
     this.obsColor = color(random(50, 255), random(50, 255), random(50, 255));
   }
-  update() { this.x -= 7; }
+  update() { this.x -= gameSpeed; } 
   show() {
     stroke(0); strokeWeight(2);
     fill(this.obsColor); 
@@ -248,23 +291,57 @@ class Cloud {
 
 function displayUI() {
   push();
-  noStroke(); 
   textAlign(LEFT); 
   textSize(22); 
   textFont('Courier New'); 
   textStyle(BOLD);
-  fill(level === 1 ? 40 : 255);
+  
+  if (score >= highScore && score > 0) {
+    fill(255, 215, 0); 
+    stroke(0);          
+    strokeWeight(2);   
+  } else {
+    noStroke();
+    fill(level === 1 ? 40 : 255);
+  }
+  
   text('YOUR SCORE: ' + floor(score / 10), 30, 45);
+  
+  noStroke();
   fill(level === 1 ? 80 : 200);
-  text('HIGH SCORE:  ' + floor(highScore / 10), 30, 75);
+  text('HIGH SCORE: ' + floor(highScore / 10), 30, 75);
   pop();
 }
 
 function showGameOverScreen() {
-  fill(0, 180); rect(0, 0, width, height);
-  fill(255); textAlign(CENTER); textSize(35);
-  text('G A M E  O V E R', width / 2, height / 2 - 10);
-  textSize(18); text('Press R to Restart', width / 2, height / 2 + 40);
+  fill(0, 180); 
+  rect(0, 0, width, height);
+  
+  textAlign(CENTER); 
+  textFont('Courier New'); 
+  textStyle(BOLD);
+  
+  if (newHighScoreAchieved) {
+    stroke(0);
+    strokeWeight(3);
+    fill(255, 215, 0); 
+    textSize(35); 
+    text('CONGRATULATIONS!', width / 2, height / 2 - 60);
+    textSize(45);
+    text('NEW HIGH SCORE!', width / 2, height / 2 - 10);
+  } else {
+    noStroke();
+    fill(255);
+    textSize(40);
+    text('G A M E  O V E R', width / 2, height / 2 - 15);
+  }
+  
+  noStroke();
+  fill(255); 
+  textSize(22);
+  text('Final Score: ' + floor(score / 10), width / 2, height / 2 + 40);
+  textSize(18); 
+  text('Press R to Restart', width / 2, height / 2 + 80);
 }
 
 function keyPressed() {
@@ -283,10 +360,14 @@ function mouseClicked() {
 }
 
 function resetGame() {
-  if (score > highScore) highScore = score;
-  score = 0; obstacles = []; birds = []; clouds = [];
+  score = 0; 
+  obstacles = []; 
+  birds = []; 
+  clouds = [];
   gameOver = false;
+  newHighScoreAchieved = false;
   level = (level === 1) ? 2 : 1;
+  gameSpeed = 7; 
   dino = new Dino();
   loop();
 }
