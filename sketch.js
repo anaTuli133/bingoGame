@@ -13,7 +13,8 @@ const groundHeight = 40;
 let obstacleSpacing = 110;
 let lastClickTime = 0;
 let gameSpeed = 7; 
-
+let gameStarted = false;
+let startTimerStartTime;
 
 let jumpSound, hitSound, highscoreSound, birdSound;
 
@@ -28,6 +29,7 @@ function preload() {
 function setup() {
   createCanvas(800, 400);
   dino = new Dino();
+  startTimerStartTime = millis(); 
   
   for (let i = 0; i < 100; i++) {
     stars.push({
@@ -53,6 +55,15 @@ function draw() {
 
   drawGround();
 
+
+  if (!gameStarted) {
+    showStartScreen();
+    if (millis() - startTimerStartTime > 5000) {
+      gameStarted = true;
+    }
+    return; 
+  }
+
   if (!gameOver) {
     score++;
     gameSpeed = 7 + floor(score / 10000); 
@@ -74,6 +85,32 @@ function draw() {
   if (gameOver) {
     showGameOverScreen();
     noLoop();
+  }
+}
+
+
+function showStartScreen() {
+  fill(0, 180); 
+  rect(0, 0, width, height);
+  
+  textAlign(CENTER);
+  textFont('Courier New');
+  textStyle(BOLD);
+
+  fill(255, 255, 255, 300);
+  textSize(16);
+  text('Developed by Anamika Saha',width / 2, height / 2 - 100); 
+  // ---------------------------------------
+  
+  fill(255);
+  textSize(26);
+  text('PRESS ENTER OR TAP TO JUMP', width / 2, height / 2 - 20);
+  
+  let timeLeft = ceil(5 - (millis() - startTimerStartTime) / 1000);
+  if (timeLeft > 0) {
+    fill(255, 215, 0);
+    textSize(20);
+    text('Game starting in: ' + timeLeft, width / 2, height / 2 + 30);
   }
 }
 
@@ -298,7 +335,7 @@ function displayUI() {
   
   if (score >= highScore && score > 0) {
     fill(255, 215, 0); 
-    stroke(0);          
+    stroke(0);           
     strokeWeight(2);   
   } else {
     noStroke();
@@ -345,13 +382,25 @@ function showGameOverScreen() {
 }
 
 function keyPressed() {
-  if (key === ' ' && !gameOver) dino.jump();
+
+  if (key === 'Enter' && !gameStarted) {
+    gameStarted = true;
+  }
+
+  if (!gameOver && gameStarted) {
+
+    if (key === ' ' || key === 'Enter') dino.jump();
+  }
+  
   if (key === 'r' || key === 'R') resetGame();
 }
 
 function mouseClicked() {
-  if (gameOver) resetGame();
-  else {
+  if (!gameStarted) {
+    gameStarted = true; 
+  } else if (gameOver) {
+    resetGame();
+  } else {
     let now = millis();
     if (now - lastClickTime < 250) dino.highJump();
     else dino.jump();
@@ -369,5 +418,6 @@ function resetGame() {
   level = (level === 1) ? 2 : 1;
   gameSpeed = 7; 
   dino = new Dino();
+  gameStarted = true; 
   loop();
 }
