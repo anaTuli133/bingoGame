@@ -14,7 +14,8 @@ let obstacleSpacing = 110;
 let lastClickTime = 0;
 let gameSpeed = 7; 
 let gameStarted = false;
-let startTimerStartTime;
+let orientationStartedTime = null; 
+let canStartGame = false; 
 
 let jumpSound, hitSound, highscoreSound, birdSound;
 
@@ -32,7 +33,6 @@ function setup() {
   createCanvas(canvasW, canvasH);
   
   dino = new Dino();
-  startTimerStartTime = millis(); 
   
   for (let i = 0; i < 100; i++) {
     stars.push({
@@ -61,7 +61,15 @@ function draw() {
     textSize(12);
     fill(200);
     text('Then Double Tap To enjoy the full experience', width / 2, height / 2 + 30);
+    
+    orientationStartedTime = null; 
+    canStartGame = false;
     return; 
+  }
+
+
+  if (orientationStartedTime === null) {
+    orientationStartedTime = millis();
   }
 
   drawLayeredBackground();
@@ -73,13 +81,16 @@ function draw() {
 
   drawGround();
 
+
   if (!gameStarted) {
-    showStartScreen();
-    if (millis() - startTimerStartTime > 5000) {
-      gameStarted = true;
+    showStartScreen(); 
+    let elapsed = millis() - orientationStartedTime;
+    if (elapsed > 5000) {
+      canStartGame = true; 
     }
     return; 
   }
+
 
   if (!gameOver) {
     score++;
@@ -115,24 +126,28 @@ function showStartScreen() {
 
   fill(255, 255, 255, 300);
   textSize(16);
-  text('Developed by Anamika Saha', width / 2, height / 2 - 100); 
+  text('Developed by Anamika Saha', width / 2, height / 2 - 60); 
   
-  fill(255);
-  textSize(24);
-  text('PRESS ENTER OR TAP TO JUMP', width / 2, height / 2 - 20);
+  let elapsed = millis() - orientationStartedTime;
+  let timeLeft = ceil(5 - elapsed / 1000);
 
+  if (timeLeft > 0) {
+    fill(255, 215, 0);
+    textSize(22);
+    text('Game starting in: ' + timeLeft, width / 2, height / 2);
+  } else {
+    fill(0, 255, 0);
+    textSize(24);
+    text('READY TO PLAY!', width / 2, height / 2 - 10);
+    fill(255);
+    textSize(14);
+    text('TAP TO START', width / 2, height / 2 + 30);
+  }
 
   if (windowWidth < 600) {
     fill(255, 255, 255, 150);
-    textSize(13);
-    text('(Double tap for Full Screen)', width / 2, height / 2 + 65);
-  }
-  
-  let timeLeft = ceil(5 - (millis() - startTimerStartTime) / 1000);
-  if (timeLeft > 0) {
-    fill(255, 215, 0);
-    textSize(20);
-    text('Game starting in: ' + timeLeft, width / 2, height / 2 + 30);
+    textSize(12);
+    text('(Double tap for Full Screen)', width / 2, height - 30);
   }
 }
 
@@ -190,7 +205,6 @@ function handleGameElements() {
     if (level === 1) {
       if (random(1) < 0.6) obstacles.push(new Obstacle());
       else birds.push(new Bird()); 
-
     } else {
       obstacles.push(new Obstacle());
     }
@@ -409,33 +423,42 @@ function showGameOverScreen() {
 }
 
 function keyPressed() {
-  if (key === 'Enter' && !gameStarted) {
-    gameStarted = true;
-  }
-  if (!gameOver && gameStarted) {
-    if (key === ' ' || key === 'Enter') dino.jump();
-  }
-  if (key === 'r' || key === 'R') resetGame();
-}
-
-function mouseClicked() {
-  let fs = fullscreen();
-  if (!fs && windowWidth < 600) {
-    fullscreen(true);
-  }
-
-  if (!gameStarted) {
-    gameStarted = true; 
-  } else if (gameOver) {
-    resetGame();
-  } else {
-    let now = millis();
-    if (now - lastClickTime < 250) {
-      dino.highJump();
+  if (key === 'Enter') {
+    if (!gameStarted && canStartGame) {
+      gameStarted = true;
+    } else if (gameOver) {
+      resetGame();
     } else {
       dino.jump();
     }
-    lastClickTime = now;
+  }
+  if (key === ' ' && gameStarted && !gameOver) {
+    dino.jump();
+  }
+  if ((key === 'r' || key === 'R') && gameOver) resetGame();
+}
+
+function mouseClicked() {
+  let now = millis();
+  let isDoubleTap = (now - lastClickTime < 300);
+  lastClickTime = now;
+
+
+  if (isDoubleTap) {
+    let fs = fullscreen();
+    fullscreen(!fs);
+    return; 
+  }
+
+  // Single Tap- Game control
+  if (!gameStarted) {
+    if (canStartGame) {
+      gameStarted = true;
+    }
+  } else if (gameOver) {
+    resetGame();
+  } else {
+    dino.jump();
   }
 }
 
@@ -450,5 +473,6 @@ function resetGame() {
   gameSpeed = 7; 
   dino = new Dino();
   gameStarted = true; 
+  orientationStartedTime = millis(); 
   loop();
 }
