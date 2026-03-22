@@ -24,19 +24,26 @@ I designed the UI to be clean and high-contrast, ensuring legibility across both
 
 ## 🔥 Key Technical Features
 
-* **Advanced Audio Feedback:** Implemented a reactive audio engine. Each action (Jumping, High-Score) has its own signature sound. Most importantly, I’ve added a **unique audio trigger specifically for Bird collisions**.
-* **Parallax Background System:** Simulated depth by engineering a multi-layered background where hills and trees move at varying speeds relative to the player.
-* **Dynamic UI Color Adaptation:** The scoreboard and interface colors dynamically flip between dark and light themes based on the environment level to maintain 100% accessibility.
-* **Responsive Collision Physics:** Custom AABB (Axis-Aligned Bounding Box) collision detection ensures fair hitboxes for both static and animated entities.
-* **Environmental State Machine:** The game transitions between "Day" and "Night" palettes dynamically, updating the star field, moon, and lighting based on level progression.
+* **📱 Mobile-Optimized UX:**
+    * **Smart Orientation Detection:** Prompts users to rotate their phones if they are in portrait mode.
+    * **5-Second Countdown:** Gives users a grace period to get ready after rotating the screen.
+    * **Double-Tap Fullscreen:** Uses the Web API to toggle immersive fullscreen mode via a rapid double-tap.
+* **🎭 Parallax Background:** Multi-layered scrolling (clouds, trees, hills) that moves at different speeds to simulate 3D depth.
+* **📈 Dynamic Difficulty:** As your score increases, the game speed accelerates and obstacle spacing tightens.
+* **🔊 Immersive Audio Engine:** Custom sound effects for jumping, hitting obstacles, bird encounters, and breaking high scores.
+* **🌗 Environmental States:** Real-time color palette shifting between levels (Day vs. Night) to keep the gameplay fresh.
 
 ---
 
 ## 🕹️ Controls & Mechanics
 
-* **Jump:** Press `Spacebar` or `Left Click` to dodge cacti.
-* **High Jump:** `Double-Click` or tap twice rapidly to leap over high-flying birds.
-* **Restart:** Hit the `R` key post-game over to re-initialize the game state.
+| Action | PC (Keyboard) | Mobile (Touch) |
+| :--- | :--- | :--- |
+| **Start Game** | `Enter` | Single Tap (after 5s) |
+| **Normal Jump** | `Space` / `Enter` | Single Tap |
+| **High Jump** | N/A | Rapid Double Tap |
+| **Toggle Fullscreen**| N/A | Double Tap |
+| **Restart Game** | `R` Key | Tap on Game Over Screen |
 
 ---
 
