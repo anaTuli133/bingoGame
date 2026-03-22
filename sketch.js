@@ -27,7 +27,10 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(800, 400);
+  let canvasW = windowWidth > 800 ? 800 : windowWidth;
+  let canvasH = (canvasW * 400) / 800;
+  createCanvas(canvasW, canvasH);
+  
   dino = new Dino();
   startTimerStartTime = millis(); 
   
@@ -46,6 +49,21 @@ function setup() {
 }
 
 function draw() {
+
+  if (windowWidth < windowHeight && windowWidth < 600) {
+    background(26);
+    fill(255, 215, 0);
+    textAlign(CENTER);
+    textSize(18);
+    textFont('Courier New');
+    textStyle(BOLD);
+    text('PLEASE ROTATE YOUR PHONE 📱', width / 2, height / 2);
+    textSize(12);
+    fill(200);
+    text('Then Double Tap To enjoy the full experience', width / 2, height / 2 + 30);
+    return; 
+  }
+
   drawLayeredBackground();
   
   for (let element of scenery) {
@@ -54,7 +72,6 @@ function draw() {
   }
 
   drawGround();
-
 
   if (!gameStarted) {
     showStartScreen();
@@ -88,7 +105,6 @@ function draw() {
   }
 }
 
-
 function showStartScreen() {
   fill(0, 180); 
   rect(0, 0, width, height);
@@ -99,12 +115,18 @@ function showStartScreen() {
 
   fill(255, 255, 255, 300);
   textSize(16);
-  text('Developed by Anamika Saha',width / 2, height / 2 - 100); 
-  // ---------------------------------------
+  text('Developed by Anamika Saha', width / 2, height / 2 - 100); 
   
   fill(255);
-  textSize(26);
+  textSize(24);
   text('PRESS ENTER OR TAP TO JUMP', width / 2, height / 2 - 20);
+
+
+  if (windowWidth < 600) {
+    fill(255, 255, 255, 150);
+    textSize(13);
+    text('(Double tap for Full Screen)', width / 2, height / 2 + 65);
+  }
   
   let timeLeft = ceil(5 - (millis() - startTimerStartTime) / 1000);
   if (timeLeft > 0) {
@@ -112,6 +134,12 @@ function showStartScreen() {
     textSize(20);
     text('Game starting in: ' + timeLeft, width / 2, height / 2 + 30);
   }
+}
+
+function windowResized() {
+  let w = windowWidth > 800 ? 800 : windowWidth;
+  let h = (w * 400) / 800;
+  resizeCanvas(w, h);
 }
 
 function drawLayeredBackground() {
@@ -173,7 +201,6 @@ function handleGameElements() {
     clouds[i].update(); clouds[i].show();
     if (clouds[i].offscreen()) clouds.splice(i, 1);
   }
-
 
   for (let i = obstacles.length - 1; i >= 0; i--) {
     obstacles[i].update(); obstacles[i].show();
@@ -329,7 +356,7 @@ class Cloud {
 function displayUI() {
   push();
   textAlign(LEFT); 
-  textSize(22); 
+  textSize(20); 
   textFont('Courier New'); 
   textStyle(BOLD);
   
@@ -378,32 +405,36 @@ function showGameOverScreen() {
   textSize(22);
   text('Final Score: ' + floor(score / 10), width / 2, height / 2 + 40);
   textSize(18); 
-  text('Press R to Restart', width / 2, height / 2 + 80);
+  text('Press R or Tap to Restart', width / 2, height / 2 + 80);
 }
 
 function keyPressed() {
-
   if (key === 'Enter' && !gameStarted) {
     gameStarted = true;
   }
-
   if (!gameOver && gameStarted) {
-
     if (key === ' ' || key === 'Enter') dino.jump();
   }
-  
   if (key === 'r' || key === 'R') resetGame();
 }
 
 function mouseClicked() {
+  let fs = fullscreen();
+  if (!fs && windowWidth < 600) {
+    fullscreen(true);
+  }
+
   if (!gameStarted) {
     gameStarted = true; 
   } else if (gameOver) {
     resetGame();
   } else {
     let now = millis();
-    if (now - lastClickTime < 250) dino.highJump();
-    else dino.jump();
+    if (now - lastClickTime < 250) {
+      dino.highJump();
+    } else {
+      dino.jump();
+    }
     lastClickTime = now;
   }
 }
