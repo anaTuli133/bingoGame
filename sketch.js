@@ -34,9 +34,10 @@ function setup() {
   
   dino = new Dino();
   
-  for (let i = 0; i < 100; i++) {
+  stars = []; 
+  for (let i = 0; i < 150; i++) {
     stars.push({
-      x: random(width),
+      x: random(2000), 
       y: random(height / 1.5),
       size: random(1, 3),
       brightness: random(150, 255)
@@ -184,8 +185,21 @@ function drawStarsAndMoon() {
   ellipse(moonX, moonY, 70, 70); 
   fill(200, 200, 180, 100);
   ellipse(moonX - 15, moonY - 10, 12, 12);
+
   for (let s of stars) {
-    fill(255, random(150, 255));
+    fill(255, s.brightness);
+    
+
+    if (gameStarted && !gameOver) {
+      s.x -= gameSpeed * 0.2; 
+    }
+
+
+    if (s.x < -10) {
+      s.x = width + random(100, 500); 
+      s.y = random(height / 1.5); 
+    }
+
     ellipse(s.x, s.y, s.size);
   }
 }
